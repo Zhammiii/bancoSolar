@@ -35,6 +35,7 @@ app.get("/usuarios", async (req, res) => {
 app.post("/usuario", async (req, res) => {
     try {
       const { nombre, balance } = req.body;
+      console.log(req.body);
       const query =
         "INSERT INTO usuarios (nombre, balance) VALUES ($1, $2) RETURNING *";
       const values = [nombre, balance];

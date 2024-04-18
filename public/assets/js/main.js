@@ -27,16 +27,14 @@ const setInfoModal = (nombre, balance, id) => {
     let nombre = $("form:first input:first").val();
     let balance = Number($("form:first input:nth-child(2)").val());
     try {
-      const response = await fetch("http://localhost:3000/usuario", {
-        method: "post",
-        body: JSON.stringify({
+      const response = await axios.post("http://localhost:3000/usuario", {
           nombre,
           balance,
-        }),
-      });
+        },
+      );
       $("form:first input:first").val("");
       $("form:first input:nth-child(2)").val("");
-      location.reload(); 
+      location.reload();  
     } catch (e) {
       alert("Algo salió mal ..." + e);
     }
@@ -52,15 +50,13 @@ const setInfoModal = (nombre, balance, id) => {
       return false;
     }
     try {
-      const response = await fetch("http://localhost:3000/transferencia", {
-        method: "post",
-        body: JSON.stringify({
+      const response = await axios.post("http://localhost:3000/transferencia", 
+        {
           emisor,
           receptor,
           monto,
-        }),
-      });
-      const data = await response.json();
+        },
+      );
       location.reload();
     } catch (e) {
       console.log(e);
@@ -69,8 +65,8 @@ const setInfoModal = (nombre, balance, id) => {
   });
 
   const getUsuarios = async () => {
-    const response = await fetch("http://localhost:3000/usuarios");
-    let data = await response.json();
+    const response = await axios.get("http://localhost:3000/usuarios");
+    let data = await response.data;
     $(".usuarios").html("");
 
     $.each(data, (i, c) => {
