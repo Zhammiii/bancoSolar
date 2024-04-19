@@ -90,73 +90,63 @@ app.post('/transferencia', async (req, res) => {
         code: 400
       });
     }
-    console.log("BEGIN START");
+    
     await pool.query("BEGIN");
+    
     const descontar = `UPDATE usuarios SET balance = balance - ${monto} WHERE id = ${emisor} RETURNING *`;
     const clienteDescontado = await pool.query(descontar);
 
-    if (!clienteDescontado.rowCount) {
+    if (clienteDescontado.rowCount === 0) {
       await pool.query("ROLLBACK");
-      console.log({
-        status: "Error",
-        message: "Falla al descontar saldo del emisor",
-        code: 500,
-        emisor: clienteDescontado.rows[0],
-        receptor: receptor
-      });
       return res.status(500).json({
         status: "Error",
         message: "Falla al descontar saldo del emisor",
         code: 500
       });
     }
+    
     const acreditar = `UPDATE usuarios SET balance = balance + ${monto} WHERE id = ${receptor} RETURNING *`;
     const clienteAcreditado = await pool.query(acreditar);
 
-    if (!clienteAcreditado.rowCount) {
+    if (clienteAcreditado.rowCount === 0) {
       await pool.query("ROLLBACK");
-      console.log({
-        status: "Error",
-        message: "Falla al acreditar saldo al receptor",
-        code: 500,
-        emisor: emisor,
-        receptor: clienteAcreditado.rows[0]
-      });
       return res.status(500).json({
         status: "Error",
         message: "Falla al acreditar saldo al receptor",
         code: 500
       });
     }
+    
     const obtenerNombres = `
-      SELECT t.emisor, e.nombre AS nombre_emisor, t.receptor, r.nombre AS nombre_receptor
-      FROM transferencias t
-      INNER JOIN usuarios e ON t.emisor = e.id
-      INNER JOIN usuarios r ON t.receptor = r.id
-      WHERE t.emisor IN (${emisor}, ${receptor}) OR t.receptor IN (${emisor}, ${receptor})
+      SELECT e.nombre AS nombre_emisor, r.nombre AS nombre_receptor
+      FROM usuarios e
+      INNER JOIN usuarios r ON e.id = ${emisor} AND r.id = ${receptor}
     `;
     const nombres = await pool.query(obtenerNombres);
+
+    if (nombres.rows.length !== 1) {
+      await pool.query("ROLLBACK");
+      return res.status(500).json({
+        status: "Error",
+        message: "No se encontraron nombres para los emisores y receptores",
+        code: 500
+      });
+    }
+
     const insertTransferencia = `
       INSERT INTO transferencias (emisor, receptor, monto, fecha)
       VALUES (${emisor}, ${receptor}, ${monto}, NOW())
     `;
     await pool.query(insertTransferencia);
 
-    console.log({
-      status: "Ok",
-      message: "Operación realizada con éxito.",
-      code: 200,
-      emisor: nombres.rows[0].nombre,
-      receptor: nombres.rows[1].nombre 
-    });
     await pool.query("COMMIT");
-    console.log("COMMIT END");
+    
     return res.status(200).json({
       status: "Ok",
       message: "Operación realizada con éxito.",
       code: 200,
-      emisor: nombres.rows[0].nombre, 
-      receptor: nombres.rows[1].nombre 
+      emisor: nombres.rows[0].nombre_emisor,
+      receptor: nombres.rows[0].nombre_receptor
     });
   } catch (error) {
     await pool.query("ROLLBACK");
@@ -169,6 +159,7 @@ app.post('/transferencia', async (req, res) => {
     });
   }
 });
+
 
 /* registro de tranferencias */
 app.get("/transferencias", async (req, res) => {
