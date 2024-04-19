@@ -129,8 +129,12 @@ app.post('/transferencia', async (req, res) => {
       });
     }
     const obtenerNombres = `
-    SELECT id, nombre FROM usuarios WHERE id IN (${emisor}, ${receptor})
-  `;
+      SELECT t.emisor, e.nombre AS nombre_emisor, t.receptor, r.nombre AS nombre_receptor
+      FROM transferencias t
+      INNER JOIN usuarios e ON t.emisor = e.id
+      INNER JOIN usuarios r ON t.receptor = r.id
+      WHERE t.emisor IN (${emisor}, ${receptor}) OR t.receptor IN (${emisor}, ${receptor})
+    `;
     const nombres = await pool.query(obtenerNombres);
     const insertTransferencia = `
       INSERT INTO transferencias (emisor, receptor, monto, fecha)
@@ -169,7 +173,12 @@ app.post('/transferencia', async (req, res) => {
 /* registro de tranferencias */
 app.get("/transferencias", async (req, res) => {
   try {
-    const query = "SELECT * FROM transferencias";
+    const query = `
+      SELECT t.*, e.nombre AS nombre_emisor, r.nombre AS nombre_receptor
+      FROM transferencias t
+      INNER JOIN usuarios e ON t.emisor = e.id
+      INNER JOIN usuarios r ON t.receptor = r.id
+    `;
     const result = await pool.query(query);
     res.send(result.rows);
   } catch (error) {
