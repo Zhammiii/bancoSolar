@@ -87,8 +87,8 @@ const setInfoModal = (nombre, balance, id) => {
               </tr>
          `);
 
-      $("#emisor").append(`<option value="${c.nombre}">${c.nombre}</option>`);
-      $("#receptor").append(`<option value="${c.nombre}">${c.nombre}</option>`);
+      $("#emisor").append(`<option value="${c.id}">${c.nombre}</option>`);
+      $("#receptor").append(`<option value="${c.id}">${c.nombre}</option>`);
     });
   };
 
