@@ -9,7 +9,6 @@ app.use(express.json());
 app.use(express.static("public"));
 
 /* Rutas */
-
 app.get("/", async (req, res) => {
   try {
     res.sendFile("/index.html");
@@ -19,7 +18,6 @@ app.get("/", async (req, res) => {
 });
 
 /* obtener usuarios */
-
 app.get("/usuarios", async (req, res) => {
   try {
     const query = "SELECT * FROM usuarios";
@@ -49,7 +47,6 @@ app.post("/usuario", async (req, res) => {
   }
 });
 
-
 /* para eliminar */
 app.delete("/usuario", async (req, res) => {
   try {
@@ -64,7 +61,6 @@ app.delete("/usuario", async (req, res) => {
 });
 
 /* Para editar */
-
 app.put("/usuario/:id", async (req, res) => {
   const { id } = req.params;
   const { nombre, balance } = req.body;
@@ -160,7 +156,6 @@ app.post('/transferencia', async (req, res) => {
   }
 });
 
-
 /* registro de tranferencias */
 app.get("/transferencias", async (req, res) => {
   try {
@@ -178,4 +173,5 @@ app.get("/transferencias", async (req, res) => {
     });
   }
 });
+
 export { app, PORT };
