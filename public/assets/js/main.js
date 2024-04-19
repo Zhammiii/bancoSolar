@@ -102,25 +102,26 @@ const setInfoModal = (nombre, balance, id) => {
   const getTransferencias = async () => {
     const { data } = await axios.get("http://localhost:3000/transferencias");
     $(".transferencias").html("");
-
+  
     data.forEach((t) => {
       $(".transferencias").append(`
-       <tr>
-         <td> ${t[4]} </td>
-         <td> ${t[1]} </td>
-         <td> ${t[2]} </td>
-         <td> ${t[3]} </td>
-       </tr>
-     `);
+        <tr>
+          <td> ${formatDate(t.fecha)} </td>
+          <td> ${t.emisor} </td>
+          <td> ${t.receptor} </td>
+          <td> ${t.monto} </td>
+        </tr>
+      `);
     });
   };
-
-  getUsuarios();
-  getTransferencias();
+  
 
   const formatDate = (date) => {
     const dateFormat = moment(date).format("L");
     const timeFormat = moment(date).format("LTS");
     return `${dateFormat} ${timeFormat}`;
   };
-  formatDate();
+
+  getUsuarios();
+  getTransferencias();
+
