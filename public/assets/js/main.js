@@ -24,15 +24,27 @@ $("form:first").submit(async (e) => {
   let nombre = $("form:first input:first").val().trim();
   let balance = $("form:first input:nth-child(2)").val().trim();
 
-/* Convertir el nombre a formato correcto */
+  /* Validar que el nombre sea mayor a 3 caracteres */
+  if (nombre.length < 3) {
+    alert("El nombre debe tener al menos 3 caracteres.");
+    return;
+  }
+
+  /* Convertir el nombre a formato correcto */
   nombre = nombre.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 
   /* Validación de nombre */
-  const nombreRegex = /^[A-Za-zÁÉÍÓÚáéíóúÄËÏÖÜäëïöüÑñ\s.'-]{1,100}$/;
+  const nombreRegex = /^[A-Za-zÁÉÍÓÚáéíóúÄËÏÖÜäëïöüÑñ\s.'-]{1,50}$/;
   if (!nombreRegex.test(nombre)) {
     alert(
       "Nombre inválido. Asegúrate de ingresar solo letras, espacios y caracteres permitidos."
     );
+    return;
+  }
+
+  /* Validar que el balance sea mayor a 0 */
+  if (parseFloat(balance) <= 0) {
+    alert("El balance debe ser mayor a 0.");
     return;
   }
 
