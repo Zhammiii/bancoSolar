@@ -1,3 +1,4 @@
+const URL_BASE = "http://localhost:3000/apiV1"
 const setInfoModal = (nombre, balance, id) => {
   $("#nombreEdit").val(nombre);
   $("#balanceEdit").val(balance);
@@ -12,7 +13,7 @@ const editUsuario = async (id) => {
   name = name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 
   try {
-    const { data } = await axios.put(`http://localhost:3000/usuario/${id}`, {
+    const { data } = await axios.put(`${URL_BASE}/users/usuario/${id}`, {
       nombre: name,
       balance: balance,
     });
@@ -62,7 +63,7 @@ $("form:first").submit(async (e) => {
   }
 
   try {
-    const response = await axios.post("http://localhost:3000/usuario", {
+    const response = await axios.post(`${URL_BASE}/users/usuario`, {
       nombre,
       balance,
     });
@@ -98,7 +99,7 @@ $("form:last").submit(async (e) => {
   }
 
   try {
-      const response = await axios.post("http://localhost:3000/transferencia", {
+      const response = await axios.post(`${URL_BASE}/transactions/transferencia`, {
           emisor,
           receptor,
           monto,
@@ -111,7 +112,7 @@ $("form:last").submit(async (e) => {
 });
 
 const getUsuarios = async () => {
-  const response = await axios.get("http://localhost:3000/usuarios");
+  const response = await axios.get(`${URL_BASE}/users/usuarios`);
   let data = await response.data;
   $(".usuarios").html("");
 
@@ -141,14 +142,14 @@ const getUsuarios = async () => {
 
 const eliminarUsuario = async (id) => {
   try {
-    const transferenciasResponse = await axios.get("http://localhost:3000/transferencias");
+    const transferenciasResponse = await axios.get(`${URL_BASE}/transactions/transferencias`);
     const transferencias = transferenciasResponse.data;
     const usuarioPresente = transferencias.some(t => t.emisor === id || t.receptor === id);
     if (usuarioPresente) {
       alert("No se puede eliminar este usuario ya que ha realizado transferencias.");
       return;
     }
-    const response = await fetch(`http://localhost:3000/usuario?id=${id}`, {
+    const response = await fetch(`${URL_BASE}/users/usuario?id=${id}`, {
       method: "DELETE",
     });
     if (!response.ok) {
@@ -163,7 +164,7 @@ const eliminarUsuario = async (id) => {
 };
 const getTransferencias = async () => {
   try {
-    const { data } = await axios.get("http://localhost:3000/transferencias");
+    const { data } = await axios.get(`${URL_BASE}/transactions/transferencias`);
     $(".transferencias").html("");
 
     data.forEach((t) => {
