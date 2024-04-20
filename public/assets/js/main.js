@@ -1,4 +1,5 @@
-const URL_BASE = "http://localhost:3000/apiV1"
+const URL_BASE = "http://localhost:3000/apiV1";
+
 const setInfoModal = (nombre, balance, id) => {
   $("#nombreEdit").val(nombre);
   $("#balanceEdit").val(balance);
@@ -29,9 +30,9 @@ $("form:first").submit(async (e) => {
   let nombre = $("form:first input:first").val().trim();
   let balance = $("form:first input:nth-child(2)").val().trim();
 
-  /* Validar que el nombre sea mayor a 3 caracteres */
-  if (nombre.length < 3) {
-    alert("El nombre debe tener al menos 3 caracteres.");
+  /* Validar que el balance sea mayor o igual a 500 */
+  if (parseFloat(balance) < 500) {
+    alert("El balance debe ser como mínimo de 500.");
     return;
   }
 
@@ -43,21 +44,6 @@ $("form:first").submit(async (e) => {
   if (!nombreRegex.test(nombre)) {
     alert(
       "Nombre inválido. Asegúrate de ingresar solo letras, espacios y caracteres permitidos."
-    );
-    return;
-  }
-
-  /* Validar que el balance sea mayor a 0 */
-  if (parseFloat(balance) <= 0) {
-    alert("El balance debe ser mayor a 0.");
-    return;
-  }
-
-  /* Validación de balance */
-  const balanceRegex = /^\d+(\.\d{1,2})?$/;
-  if (!balanceRegex.test(balance) || parseFloat(balance) > 100000000) {
-    alert(
-      "Balance inválido. Ingresa un número válido que no supere los 100,000,000."
     );
     return;
   }
@@ -80,34 +66,34 @@ $("form:last").submit(async (e) => {
   let emisor = $("form:last select:first").val();
   let receptor = $("form:last select:last").val();
   let monto = $("#monto").val().trim();
+
+  /* Validar que el monto sea mayor o igual a 500 */
+  if (parseFloat(monto) < 500) {
+    alert("El monto a transferir debe ser como mínimo de 500.");
+    return;
+  }
+
   if (!monto || !emisor || !receptor) {
-      alert("Debe seleccionar un emisor, receptor y monto a transferir");
-      return false;
+    alert("Debe seleccionar un emisor, receptor y monto a transferir");
+    return false;
   }
 
   /* Verificar si el emisor y el receptor son el mismo usuario */
   if (emisor === receptor) {
-      alert("No puedes transferir fondos a ti mismo. Por favor selecciona otro receptor.");
-      return;
-  }
-
-  /* Validación de monto */
-  const montoRegex = /^[1-9]\d*(\.\d{1,2})?$/;
-  if (!montoRegex.test(monto) || parseFloat(monto) > 100000000) {
-      alert("Monto inválido. Ingresa un número válido mayor que cero y no superior a 100,000,000.");
-      return;
+    alert("No puedes transferir fondos a ti mismo. Por favor selecciona otro receptor.");
+    return;
   }
 
   try {
-      const response = await axios.post(`${URL_BASE}/transactions/transferencia`, {
-          emisor,
-          receptor,
-          monto,
-      });
-      location.reload();
+    const response = await axios.post(`${URL_BASE}/transactions/transferencia`, {
+      emisor,
+      receptor,
+      monto,
+    });
+    location.reload();
   } catch (e) {
-      console.log(e);
-      alert("Algo salió mal..." + e);
+    console.log(e);
+    alert("Algo salió mal..." + e);
   }
 });
 
@@ -162,6 +148,7 @@ const eliminarUsuario = async (id) => {
     alert("No se puede eliminar este usuario ya que ha realizado transferencias. ");
   }
 };
+
 const getTransferencias = async () => {
   try {
     const { data } = await axios.get(`${URL_BASE}/transactions/transferencias`);
