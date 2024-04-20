@@ -5,8 +5,12 @@ const setInfoModal = (nombre, balance, id) => {
 };
 
 const editUsuario = async (id) => {
-  const name = $("#nombreEdit").val();
-  const balance = $("#balanceEdit").val();
+  let name = $("#nombreEdit").val();
+  let balance = $("#balanceEdit").val();
+
+  /* Convertir el nombre a formato correcto */
+  name = name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+
   try {
     const { data } = await axios.put(`http://localhost:3000/usuario/${id}`, {
       nombre: name,
